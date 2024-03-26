@@ -2,14 +2,11 @@ package com.lottery.lottery.service.impl;
 
 import com.lottery.lottery.service.LotteryService;
 
-import java.text.DecimalFormat;
-import java.util.Random;
-
-public class LotteryServieImpl implements LotteryService {
+public class LotteryServiceImpl implements LotteryService {
 
     public static void main(String[] args) {
-        LotteryServieImpl lotteryServie = new LotteryServieImpl();
-        lotteryServie.createLottery(10);
+        LotteryServiceImpl lotteryService = new LotteryServiceImpl();
+        lotteryService.createLottery(10);
     }
     @Override
     public void createLottery(int numberOfLines) {
