@@ -8,6 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 public class LotteryCreateRequest {
 
-    int n;
+    int noOfLines;
 
 }

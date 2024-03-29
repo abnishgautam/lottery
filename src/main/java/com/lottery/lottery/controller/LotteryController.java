@@ -2,31 +2,33 @@ package com.lottery.lottery.controller;
 
 import com.lottery.lottery.Entity.Ticket;
 import com.lottery.lottery.pojo.LotteryCreateRequest;
+import com.lottery.lottery.pojo.TicketResponse;
 import com.lottery.lottery.service.LotteryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@RestController("v1")
+@RestController()
 public class LotteryController {
 
     @Autowired
     private LotteryService lottery;
 
     @PostMapping("/ticket")
-    public void createTicket(@RequestBody LotteryCreateRequest lotteryCreateRequest){
-        lottery.createLottery(10);
+    public ResponseEntity<Integer> createTicket(@RequestBody LotteryCreateRequest lotteryCreateRequest){
+        return new ResponseEntity<>(lottery.createLottery(lotteryCreateRequest.getNoOfLines()), HttpStatus.CREATED);
     }
 
     @GetMapping("/ticket")
-    public List<Ticket> getAllTicket(){
-        List<Ticket> tickets = new ArrayList<>();
-        return tickets;
+    public ResponseEntity<List<TicketResponse>> getAllTicket(){
+      return new ResponseEntity<>(lottery.getAllTickets(),HttpStatus.OK);
     }
 
-    @GetMapping("/ticket/{id}")
+/*    @GetMapping("/ticket/{id}")
     public Ticket getTicket(){
         Ticket ticket = new Ticket();
         return ticket;
@@ -42,5 +44,5 @@ public class LotteryController {
     public Ticket updateStatus(){
         Ticket ticket = new Ticket();
         return ticket;
-    }
+    }*/
 }
