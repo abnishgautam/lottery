@@ -12,4 +12,6 @@ public interface LotteryService {
     public Integer createLottery(int numberOfLines);
 
     public List<TicketResponse> getAllTickets();
+
+    TicketResponse getTicket(int id);
 }

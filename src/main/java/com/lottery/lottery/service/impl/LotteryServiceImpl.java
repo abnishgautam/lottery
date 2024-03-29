@@ -45,6 +45,18 @@ public class LotteryServiceImpl implements LotteryService {
         return ticketResponses;
     }
 
+    @Override
+    public TicketResponse getTicket(int id) {
+        TicketResponse ticketResponse = new TicketResponse();
+
+        ticketResponse.setTicketId(id);
+        Ticket ticketValue = ticketMap.get(id);
+        ticketResponse.setNoOfLines(ticketValue.getLines());
+        ticketResponse.setStatusChecked(ticketValue.isStatusChecked());
+
+        return ticketResponse;
+    }
+
     public List<String> createLotteryLines(int numberOfLines) {
         List<String> integerList = new ArrayList<>();
         for (int i = 0; i <= numberOfLines; i++) {

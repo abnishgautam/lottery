@@ -28,21 +28,20 @@ public class LotteryController {
       return new ResponseEntity<>(lottery.getAllTickets(),HttpStatus.OK);
     }
 
-/*    @GetMapping("/ticket/{id}")
-    public Ticket getTicket(){
-        Ticket ticket = new Ticket();
-        return ticket;
+    @GetMapping("/ticket/{id}")
+    public ResponseEntity<TicketResponse> getTicket(@PathVariable int id){
+        return new ResponseEntity<>(lottery.getTicket(id),HttpStatus.OK);
     }
 
-    @PutMapping("/ticket/{id}")
-    public Ticket updateTicket(){
-        Ticket ticket = new Ticket();
-        return ticket;
-    }
-
-    @PutMapping("/status/{id}")
-    public Ticket updateStatus(){
-        Ticket ticket = new Ticket();
-        return ticket;
-    }*/
+//    @PutMapping("/ticket/{id}")
+//    public Ticket updateTicket(){
+//        Ticket ticket = new Ticket();
+//        return ticket;
+//    }
+//
+//    @PutMapping("/status/{id}")
+//    public Ticket updateStatus(){
+//        Ticket ticket = new Ticket();
+//        return ticket;
+//    }
 }

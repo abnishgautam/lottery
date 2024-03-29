@@ -16,4 +16,5 @@ public class TicketResponse {
 
     private int TicketId;
     private List<String> noOfLines;
+    private boolean statusChecked;
 }
