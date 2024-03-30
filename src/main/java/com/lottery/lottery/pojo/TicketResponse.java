@@ -1,5 +1,6 @@
 package com.lottery.lottery.pojo;
 
+import com.lottery.lottery.Entity.LineOutcome;
 import com.lottery.lottery.Entity.Ticket;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +16,6 @@ import java.util.List;
 public class TicketResponse {
 
     private int TicketId;
-    private List<String> noOfLines;
     private boolean statusChecked;
+    private List<LineOutcome> outcomes;
 }

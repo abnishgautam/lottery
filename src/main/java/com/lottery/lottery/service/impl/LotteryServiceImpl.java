@@ -1,29 +1,30 @@
 package com.lottery.lottery.service.impl;
 
+import com.lottery.lottery.Entity.LineOutcome;
 import com.lottery.lottery.Entity.Ticket;
+import com.lottery.lottery.exception.TicketNotFound;
 import com.lottery.lottery.pojo.TicketResponse;
 import com.lottery.lottery.service.LotteryService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class LotteryServiceImpl implements LotteryService {
 
-    private Map<Integer, Ticket> ticketMap = new HashMap<>();
-
     public static void main(String[] args) {
         LotteryServiceImpl lotteryService = new LotteryServiceImpl();
-        lotteryService.createLotteryLines(10);
-        LotteryServiceImpl lotteryService1 = new LotteryServiceImpl();
-        lotteryService1.createLotteryLines(12);
-        lotteryService1.getAllTickets();
+        lotteryService.calculateOutcome("101");
     }
+
+    private Map<Integer, Ticket> ticketMap = new HashMap<>();
 
     public Integer createLottery(int numberOfLines){
         List<String> listOfLines = createLotteryLines(numberOfLines);
-        Ticket ticket = new Ticket(listOfLines);
+        Ticket ticket = new Ticket(listOfLines,false);
         Integer ticketId = ticket.hashCode();
         ticketMap.put(ticketId,ticket);
         return ticketId;
@@ -35,8 +36,11 @@ public class LotteryServiceImpl implements LotteryService {
 
         for (Map.Entry<Integer, Ticket> entry : ticketMap.entrySet()){
             TicketResponse ticketResponse = new TicketResponse();
+            List<LineOutcome> outcomes =  getSortedOutcomes(entry.getValue().getLines());
+            outcomes.stream().sorted();
             ticketResponse.setTicketId(entry.getKey());
-            ticketResponse.setNoOfLines(entry.getValue().getLines());
+            ticketResponse.setOutcomes(outcomes);
+            ticketResponse.setStatusChecked(entry.getValue().isStatusChecked());
             ticketResponses.add(ticketResponse);
         }
         System.out.println("TicketList");
@@ -51,15 +55,42 @@ public class LotteryServiceImpl implements LotteryService {
 
         ticketResponse.setTicketId(id);
         Ticket ticketValue = ticketMap.get(id);
-        ticketResponse.setNoOfLines(ticketValue.getLines());
+        List<LineOutcome> outcomes =  getSortedOutcomes(ticketValue.getLines());
+        outcomes.stream().sorted();
+        ticketResponse.setOutcomes(outcomes);
         ticketResponse.setStatusChecked(ticketValue.isStatusChecked());
 
         return ticketResponse;
     }
 
+    @Override
+    public TicketResponse updateLottery(int noOfLines, int ticketId) throws TicketNotFound {
+        List<String> listOfLines = createLotteryLines(noOfLines);
+        Ticket ticketValue = ticketMap.get(ticketId);
+        if(ObjectUtils.isEmpty(ticketValue)){
+            throw new TicketNotFound("Provided Ticket Id Does Not Exist");
+        }
+        ticketValue.addLines(listOfLines);
+        return getTicket(ticketId);
+    }
+
+    @Override
+    public Boolean getStatus(int id) throws TicketNotFound {
+        Ticket ticketValue = ticketMap.get(id);
+        if(ObjectUtils.isEmpty(ticketValue)){
+            throw new TicketNotFound("Provided Ticket Id Does Not Exist");
+        }
+        if(ticketValue.isStatusChecked()== true){
+            throw new RuntimeException("Lottery is already checked so status cannot be updated");
+        }
+        Boolean returnValue = ticketValue.isStatusChecked();
+        ticketValue.setStatusChecked(true);
+        return returnValue;
+    }
+
     public List<String> createLotteryLines(int numberOfLines) {
         List<String> integerList = new ArrayList<>();
-        for (int i = 0; i <= numberOfLines; i++) {
+        for (int i = 0; i < numberOfLines; i++) {
             integerList.add(getUnique(3));
         }
         integerList.stream().forEach(System.out::println);
@@ -93,5 +124,31 @@ public class LotteryServiceImpl implements LotteryService {
             numString = formatted;
         }
         return numString;
+    }
+
+    public List<LineOutcome> getSortedOutcomes(List<String> lines) {
+        List<LineOutcome> outcomes = new ArrayList<>();
+        for (String line : lines) {
+            outcomes.add(new LineOutcome(line,calculateOutcome(line)));
+        }
+        return outcomes;
+    }
+
+    public int calculateOutcome(String value) {
+        String[] digits = String.valueOf(value).split("");
+        List<String> line = Arrays.stream(digits).toList();
+        List<Integer> result = line.stream()
+                .map(Integer::valueOf)
+                .collect(Collectors.toList());
+        int sum = result.stream().mapToInt(Integer::intValue).sum();
+        if (sum == 2) {
+            return 10;
+        } else if (line.get(0).equals(line.get(1)) && line.get(1).equals(line.get(2))) {
+            return 5;
+        } else if (!line.get(0).equals(line.get(1)) && !line.get(0).equals(line.get(2))) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }

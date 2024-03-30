@@ -1,17 +1,21 @@
 package com.lottery.lottery.Entity;
 
-import java.util.List;
+import lombok.Data;
+import lombok.ToString;
 
-class LineOutcome {
-    private Integer line;
+import java.util.List;
+@Data
+@ToString
+public class LineOutcome {
+    private String line;
     private int outcome;
 
-    public LineOutcome(Integer line, int outcome) {
+    public LineOutcome(String line, int outcome) {
         this.line = line;
         this.outcome = outcome;
     }
 
-    public Integer getLine() {
+    public String getLine() {
         return line;
     }
 

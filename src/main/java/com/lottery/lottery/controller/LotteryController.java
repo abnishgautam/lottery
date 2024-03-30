@@ -1,6 +1,7 @@
 package com.lottery.lottery.controller;
 
 import com.lottery.lottery.Entity.Ticket;
+import com.lottery.lottery.exception.TicketNotFound;
 import com.lottery.lottery.pojo.LotteryCreateRequest;
 import com.lottery.lottery.pojo.TicketResponse;
 import com.lottery.lottery.service.LotteryService;
@@ -33,15 +34,14 @@ public class LotteryController {
         return new ResponseEntity<>(lottery.getTicket(id),HttpStatus.OK);
     }
 
-//    @PutMapping("/ticket/{id}")
-//    public Ticket updateTicket(){
-//        Ticket ticket = new Ticket();
-//        return ticket;
-//    }
-//
-//    @PutMapping("/status/{id}")
-//    public Ticket updateStatus(){
-//        Ticket ticket = new Ticket();
-//        return ticket;
-//    }
+    @PutMapping("/ticket/{id}")
+    public ResponseEntity<TicketResponse> updateTicket(@PathVariable int id,
+            @RequestBody LotteryCreateRequest lotteryCreateRequest) throws TicketNotFound {
+        return new ResponseEntity<>(lottery.updateLottery(lotteryCreateRequest.getNoOfLines(), id), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/status/{id}")
+    public ResponseEntity<Boolean> updateStatus(@PathVariable int id) throws TicketNotFound {
+        return new ResponseEntity<>(lottery.getStatus(id), HttpStatus.CREATED);
+    }
 }
