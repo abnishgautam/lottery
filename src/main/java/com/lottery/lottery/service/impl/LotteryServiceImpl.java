@@ -7,18 +7,11 @@ import com.lottery.lottery.pojo.TicketResponse;
 import com.lottery.lottery.service.LotteryService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
-
-import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class LotteryServiceImpl implements LotteryService {
-
-    public static void main(String[] args) {
-        LotteryServiceImpl lotteryService = new LotteryServiceImpl();
-        lotteryService.calculateOutcome("101");
-    }
 
     private Map<Integer, Ticket> ticketMap = new HashMap<>();
 
@@ -43,7 +36,6 @@ public class LotteryServiceImpl implements LotteryService {
             ticketResponse.setStatusChecked(entry.getValue().isStatusChecked());
             ticketResponses.add(ticketResponse);
         }
-        System.out.println("TicketList");
         ticketResponses.stream().forEach(System.out::println);
 
         return ticketResponses;
@@ -70,6 +62,9 @@ public class LotteryServiceImpl implements LotteryService {
         if(ObjectUtils.isEmpty(ticketValue)){
             throw new TicketNotFound("Provided Ticket Id Does Not Exist");
         }
+        if(ticketValue.isStatusChecked()== true){
+            throw new RuntimeException("Lottery is already checked so status cannot be updated");
+        }
         ticketValue.addLines(listOfLines);
         return getTicket(ticketId);
     }
@@ -79,9 +74,6 @@ public class LotteryServiceImpl implements LotteryService {
         Ticket ticketValue = ticketMap.get(id);
         if(ObjectUtils.isEmpty(ticketValue)){
             throw new TicketNotFound("Provided Ticket Id Does Not Exist");
-        }
-        if(ticketValue.isStatusChecked()== true){
-            throw new RuntimeException("Lottery is already checked so status cannot be updated");
         }
         Boolean returnValue = ticketValue.isStatusChecked();
         ticketValue.setStatusChecked(true);
@@ -107,10 +99,7 @@ public class LotteryServiceImpl implements LotteryService {
         int num = 0;
         for (int i = 0; i < ndigits; i++) {
             int d = (int) (Math.random() * digits.length());
-            // convert character to an int and "append" to the num.
             num = num * 10 + digits.charAt(d) - '0';
-
-            // effectively delete the just used digit from the string.
             digits = digits.substring(0, d) + digits.substring(d + 1);
 
         }

@@ -15,7 +15,6 @@ public class OutcomeCalculatorTest {
         assertEquals(10, calculator.calculateOutcome("200"));
         assertEquals(5, calculator.calculateOutcome("111"));
         assertEquals(1, calculator.calculateOutcome("123"));
-        //Check this condition
         assertEquals(1, calculator.calculateOutcome("122"));
         assertEquals(0, calculator.calculateOutcome("121"));
     }
