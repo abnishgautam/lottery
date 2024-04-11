@@ -2,33 +2,30 @@ package com.lottery.lottery.service.impl;
 
 import com.lottery.lottery.Entity.LineOutcome;
 import com.lottery.lottery.Entity.Ticket;
-import com.lottery.lottery.exception.TicketNotFound;
+import com.lottery.lottery.exception.TicketNotFoundException;
 import com.lottery.lottery.pojo.TicketResponse;
 import com.lottery.lottery.service.LotteryService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
+@PropertySource("classpath:application.properties")
 public class LotteryServiceImpl implements LotteryService {
 
-    private Map<String, Ticket> ticketMap = new ConcurrentHashMap<>();
+    @Value("#{'${logic.read.listoF3DigitNumber}'.split(',')}")
+    private List<String> listOf3DigitNumber;
 
-    public String createLottery(int numberOfLines){
-        List<String> listOfLines = createLotteryLines(numberOfLines);
-        Ticket ticket = new Ticket(listOfLines,false);
-        String ticketId = UUID.randomUUID().toString();
-        ticketMap.put(ticketId,ticket);
-        return ticketId;
-    }
+    private Map<String, Ticket> ticketMap = new ConcurrentHashMap<>();
 
     @Override
     public List<TicketResponse> getAllTickets() {
         List<TicketResponse> ticketResponses = new ArrayList<>();
-
         for (Map.Entry<String, Ticket> entry : ticketMap.entrySet()){
             TicketResponse ticketResponse = new TicketResponse();
             List<LineOutcome> outcomes =  getSortedOutcomes(entry.getValue().getLines());
@@ -39,16 +36,18 @@ public class LotteryServiceImpl implements LotteryService {
             ticketResponses.add(ticketResponse);
         }
         ticketResponses.stream().forEach(System.out::println);
-
         return ticketResponses;
     }
 
     @Override
-    public TicketResponse getTicket(String id) {
+    public TicketResponse getTicket(String id) throws TicketNotFoundException {
         TicketResponse ticketResponse = new TicketResponse();
 
         ticketResponse.setTicketId(id);
         Ticket ticketValue = ticketMap.get(id);
+        if(ObjectUtils.isEmpty(ticketValue)){
+            throw new TicketNotFoundException("Provided Ticket Id Does Not Exist");
+        }
         List<LineOutcome> outcomes =  getSortedOutcomes(ticketValue.getLines());
         outcomes.stream().sorted();
         ticketResponse.setOutcomes(outcomes);
@@ -58,11 +57,11 @@ public class LotteryServiceImpl implements LotteryService {
     }
 
     @Override
-    public TicketResponse updateLottery(int noOfLines, String ticketId) throws TicketNotFound {
+    public TicketResponse updateLottery(int noOfLines, String ticketId) throws TicketNotFoundException {
         List<String> listOfLines = createLotteryLines(noOfLines);
         Ticket ticketValue = ticketMap.get(ticketId);
         if(ObjectUtils.isEmpty(ticketValue)){
-            throw new TicketNotFound("Provided Ticket Id Does Not Exist");
+                throw new TicketNotFoundException("Provided Ticket Id Does Not Exist");
         }
         if(ticketValue.isStatusChecked()== true){
             throw new RuntimeException("Lottery is already checked so status cannot be updated");
@@ -72,14 +71,22 @@ public class LotteryServiceImpl implements LotteryService {
     }
 
     @Override
-    public Boolean getStatus(String id) throws TicketNotFound {
+    public Boolean getStatus(String id) throws TicketNotFoundException {
         Ticket ticketValue = ticketMap.get(id);
         if(ObjectUtils.isEmpty(ticketValue)){
-            throw new TicketNotFound("Provided Ticket Id Does Not Exist");
+            throw new TicketNotFoundException("Provided Ticket Id Does Not Exist");
         }
         Boolean returnValue = ticketValue.isStatusChecked();
         ticketValue.setStatusChecked(true);
         return returnValue;
+    }
+
+    public String createLottery(int numberOfLines){
+        List<String> listOfLines = createLotteryLines(numberOfLines);
+        Ticket ticket = new Ticket(listOfLines,false);
+        String ticketId = UUID.randomUUID().toString();
+        ticketMap.put(ticketId,ticket);
+        return ticketId;
     }
 
     public List<String> createLotteryLines(int numberOfLines) {
@@ -91,19 +98,13 @@ public class LotteryServiceImpl implements LotteryService {
         return stringList;
     }
 
-
-
-    public static String givenList_shouldReturnARandomElement() {
-        List<String> givenList = Arrays.asList("000","001","002","010","011","012","020","021","022","100","101","102","110",
-                "111","112","120","121","122","200","201","202","210","211","212","220","221","222");
+    public String givenList_shouldReturnARandomElement() {
+        List<String> givenList = listOf3DigitNumber;
         Random rand = new Random();
         String randomElement = givenList.get(rand.nextInt(givenList.size()));
         return  randomElement;
     }
-
-
-
-    public static String getUnique(int ndigits) {
+/*    public static String getUnique(int ndigits) {
         if (ndigits < 1) {
             throw new IllegalArgumentException(
                     "Number of digits must be between 1 and 3 inclusive");
@@ -125,7 +126,7 @@ public class LotteryServiceImpl implements LotteryService {
             numString = formatted;
         }
         return numString;
-    }
+    }*/
 
     public List<LineOutcome> getSortedOutcomes(List<String> lines) {
         List<LineOutcome> outcomes = new ArrayList<>();

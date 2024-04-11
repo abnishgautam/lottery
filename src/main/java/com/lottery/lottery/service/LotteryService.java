@@ -1,6 +1,6 @@
 package com.lottery.lottery.service;
 
-import com.lottery.lottery.exception.TicketNotFound;
+import com.lottery.lottery.exception.TicketNotFoundException;
 import com.lottery.lottery.pojo.TicketResponse;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.stereotype.Service;
@@ -18,14 +18,14 @@ public interface LotteryService {
     public List<TicketResponse> getAllTickets();
 
     /*This method get the ticket based on ticketId*/
-    TicketResponse getTicket(String id);
+    TicketResponse getTicket(String id) throws TicketNotFoundException;
 
     /*This method update the lottery with
     * the additional no lines*/
-    TicketResponse updateLottery(int noOfLines, String ticketId) throws TicketNotFound;
+    TicketResponse updateLottery(int noOfLines, String ticketId) throws TicketNotFoundException;
 
     /*This method is used to check the status and then update the status
     * so that this lottery could not be updated */
-    Boolean getStatus(String id) throws TicketNotFound;
+    Boolean getStatus(String id) throws  TicketNotFoundException;
 
 }
