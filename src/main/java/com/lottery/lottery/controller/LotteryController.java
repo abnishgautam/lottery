@@ -14,15 +14,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@RestController()
+@RestController
 public class LotteryController {
 
-    @Qualifier("lotteryService")
     @Autowired
     private LotteryService lottery;
 
     @PostMapping("/ticket")
-    public ResponseEntity<Integer> createTicket(@RequestBody LotteryCreateRequest lotteryCreateRequest){
+    public ResponseEntity<String> createTicket(@RequestBody LotteryCreateRequest lotteryCreateRequest){
+        if(lotteryCreateRequest.getNoOfLines() <= 0){
+            throw new IllegalArgumentException("Number of lines should be greater than 0");
+        }
         return new ResponseEntity<>(lottery.createLottery(lotteryCreateRequest.getNoOfLines()), HttpStatus.CREATED);
     }
 
@@ -32,18 +34,18 @@ public class LotteryController {
     }
 
     @GetMapping("/ticket/{id}")
-    public ResponseEntity<TicketResponse> getTicket(@PathVariable int id){
+    public ResponseEntity<TicketResponse> getTicket(@PathVariable String id){
         return new ResponseEntity<>(lottery.getTicket(id),HttpStatus.OK);
     }
 
     @PutMapping("/ticket/{id}")
-    public ResponseEntity<TicketResponse> updateTicket(@PathVariable int id,
+    public ResponseEntity<TicketResponse> updateTicket(@PathVariable String id,
             @RequestBody LotteryCreateRequest lotteryCreateRequest) throws TicketNotFound {
         return new ResponseEntity<>(lottery.updateLottery(lotteryCreateRequest.getNoOfLines(), id), HttpStatus.CREATED);
     }
 
     @PutMapping("/status/{id}")
-    public ResponseEntity<Boolean> updateStatus(@PathVariable int id) throws TicketNotFound {
+    public ResponseEntity<Boolean> updateStatus(@PathVariable String id) throws TicketNotFound {
         return new ResponseEntity<>(lottery.getStatus(id), HttpStatus.CREATED);
     }
 }

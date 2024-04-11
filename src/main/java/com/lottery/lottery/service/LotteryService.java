@@ -12,19 +12,20 @@ public interface LotteryService {
 
     /*This method takes number of lines to be generated
     * as input and returns the unique ticket id*/
-    public Integer createLottery(int numberOfLines);
+    public String createLottery(int numberOfLines);
 
     /*This method get all the ticket*/
     public List<TicketResponse> getAllTickets();
 
     /*This method get the ticket based on ticketId*/
-    TicketResponse getTicket(int id);
+    TicketResponse getTicket(String id);
 
     /*This method update the lottery with
     * the additional no lines*/
-    TicketResponse updateLottery(int noOfLines, int ticketId) throws TicketNotFound;
+    TicketResponse updateLottery(int noOfLines, String ticketId) throws TicketNotFound;
 
     /*This method is used to check the status and then update the status
     * so that this lottery could not be updated */
-    Boolean getStatus(int id) throws TicketNotFound;
+    Boolean getStatus(String id) throws TicketNotFound;
+
 }

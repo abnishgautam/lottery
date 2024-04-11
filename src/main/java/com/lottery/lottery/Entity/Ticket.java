@@ -9,6 +9,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+
+//Implement your own hashcode
 @Data
 @ToString
 public class Ticket {

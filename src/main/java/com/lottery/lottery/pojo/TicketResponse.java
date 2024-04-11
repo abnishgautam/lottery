@@ -15,7 +15,7 @@ import java.util.List;
 @ToString
 public class TicketResponse {
 
-    private int TicketId;
+    private String TicketId;
     private boolean statusChecked;
     private List<LineOutcome> outcomes;
 }
